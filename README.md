@@ -2,4 +2,4 @@ Kaleidoscope
 ============
 
 Demo:
-http://www.eclasca.de/dev/Kaleidoscope/
+http://www.eclasca.de/dev/kaleidoscope/
