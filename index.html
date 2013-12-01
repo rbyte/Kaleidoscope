@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<link href="css/main.css" rel="stylesheet">
+		<link href="css/d3.slider.css" rel="stylesheet">
+		<script src="js/d3.min.js"></script>
+		<script src="js/d3.slider.js"></script>
+		<title>Kaleidoscope</title>
+	</head>
+
+<body>
+	<div id="title">Kaleidoscope</div>
+	
+	<nav><ul id="menu">
+		<li title="Select Image"><span class="symbol">b</span>
+			<ul id="imagesUl">
+			</ul>
+		</li>
+		<li title="Select Tiling"><span class="symbol">l</span>
+			<ul>
+				<li onclick="switchShape(0)" title="Triangular Tiling"><span class="symbol">h</span>
+				</li><li onclick="switchShape(1)" title="Tetrakis Square Tiling"><span class="symbol">j</span>
+				</li><li onclick="switchShape(2)" title="Square Tiling"><span class="symbol">k</span>
+				</li><li onclick="switchShape(3)" title="Kisrhombille Tiling"><span class="symbol">l</span>
+				</li><li onclick="switchShape(4)" title="Pie Tiling"><span class="symbol">&ouml;</span>
+				</li>
+			</ul>
+		</li>
+		<li onclick="viewKalendoscopeImage()" title="Download Image"><span class="symbol">d</span></li>
+		<li title="View Source"><a href="https://github.com/rbyte/Kaleidoscope"><span class="symbol">s</span></a></li>
+	</ul>
+	</nav>
+	
+	<div id="svgdiv"></div>
+	
+	<div id="canvasFrame">
+		<span class="helperSpanToAlignImageVertically"></span>
+		<canvas id="kaleidoCanvas"></canvas>
+	</div>
+	
+	<div id="slider1" title="Shape Size"></div>
+	<div id="slider2"></div>
+	<div id="startupHelp">Drag mouse over canvas to get started.</div>
+
+	<script src="js/kaleidoscope.js"></script>
+</body>
+</html>
