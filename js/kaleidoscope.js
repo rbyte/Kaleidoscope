@@ -388,17 +388,23 @@ function drawImageToCanvas(scale) {
 	
 	// this image is masked by the shape!
 	// http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-drawimage
-	context.drawImage(imageObj,
-		/* x src */ imageObj.width * theCutRel.x,
-		/* y src */ imageObj.height * theCutRel.y,
-		/* w src */ shapeW,
-		/* h src */ shapeH,
-		/* --->  */
-		/* x dst */ -offset,
-		/* y dst */ -offset,
-		/* w dst */ shapeW * totalScaling + offset,
-		/* h dst */ shapeH * totalScaling + offset
-	)
+	// sometimes this throughs a NS_ERROR_NOT_AVAILABLE in firefox. dont know why
+//	try {
+		context.drawImage(imageObj,
+			/* x src */ imageObj.width * theCutRel.x,
+			/* y src */ imageObj.height * theCutRel.y,
+			/* w src */ shapeW,
+			/* h src */ shapeH,
+			/* --->  */
+			/* x dst */ -offset,
+			/* y dst */ -offset,
+			/* w dst */ shapeW * totalScaling + offset,
+			/* h dst */ shapeH * totalScaling + offset
+		)
+//	} catch(err) {
+//		console.log(err)
+//	}
+
 }
 
 function writeImagesToHTML() {
@@ -431,6 +437,7 @@ function loadCanvasImage(imgPath, callback) {
 	imageObj.onload = function() {
 		if (callback !== undefined)
 			callback()
+
 	}
 	imageObj.src = imgPath
 }
@@ -458,7 +465,7 @@ function updateOnResizeOrImageSwitch() {
 	d3.select("#arcPath").attr('d', currentTiling.path)
 	d3.select("#theClipPathPath").attr('d', currentTiling.path)
 	clearCanvas()
-	currentTiling.draw()
+	drawCurrent()
 }
 
 function clearCanvas() {
@@ -480,6 +487,7 @@ function updateCanvasAndSVGsize() {
 	var winW = document.body.clientWidth
 	var winH = window.innerHeight
 	
+	console.assert(winW > 0 && winH > 0)
 	var canvasSize = Math.round((winW < winH ? winW : winH) * 0.85)
 	canvas.setAttribute("height", canvasSize+"px")
 	canvas.setAttribute("width", canvasSize+"px")
@@ -488,6 +496,7 @@ function updateCanvasAndSVGsize() {
 	context.translate(canvasSize/2, canvasSize/2)
 	
 	var svgdiv = document.getElementById('svgdiv')
+	console.assert(imageObj.width > 0 && imageObj.height > 0)
 	var imageRatio = imageObj.width/imageObj.height
 	var maxR = 0.5
 	var s = 0.8
@@ -521,14 +530,14 @@ function dragMove(dx, dy) {
 		d3.select("#startupHelp").attr("style", "opacity: 0;")
 		draggedOnce = true
 	}
-	
+
 	theCutRel.x += dx/imgInSvgWidth
 	theCutRel.y += dy/imgInSvgHeight
-	
+
 	constrainTheCutAndUpdateSVGpathTranslation()
-	
+
 	clearCanvas()
-	currentTiling.draw()
+	drawCurrent()
 }
 
 function runAfterImageFinishedLoading() {
@@ -549,7 +558,7 @@ function runAfterImageFinishedLoading() {
 		.attr('width', "100%")
 		.attr('height', "100%")
 		.attr('xlink:href', imageObj.src)
-		
+
 	shapeScaleSlider = d3.slider()
 		.min(0.1)
 		.max(1)
@@ -561,18 +570,18 @@ function runAfterImageFinishedLoading() {
 			updateOnResizeOrImageSwitch()
 		})
 	d3.select('#slider1').call(shapeScaleSlider)
-	
+
 	writeImagesToHTML()
 	updateCanvasAndSVGsize()
 	setCutRelWandH()
 	theCutRel.x = (1-theCutRel.w)/2
 	theCutRel.y = (1-theCutRel.h)/2
-	
+
 	var pathTag = defsTag.append('path')
 		.attr('id', 'arcPath')
 		.attr('class', 'geom')
 		.attr('d', currentTiling.path)
-	
+
 	var clipTag = defsTag.append('clipPath')
 		.attr('id', 'theClipPath')
 
@@ -587,7 +596,7 @@ function runAfterImageFinishedLoading() {
 		.attr('xlink:href', '#arcPath')
 		.attr('class', 'geom')
 
-	
+
 	var drag = d3.behavior.drag()
 		.on("drag", function() {
 			dragMove(d3.event.dx, d3.event.dy)
@@ -609,7 +618,7 @@ function runAfterImageFinishedLoading() {
 			d3.select('#kaleidoCanvas').attr("class", "")
 			d3.select('#canvasFrame').attr("class", "")
 		})
-	
+
 	d3.select('#kaleidoCanvas').call(dragForCanvas)
 
 	svg.append('svg:use')
@@ -618,14 +627,14 @@ function runAfterImageFinishedLoading() {
 		.attr('opacity', 1)
 		.attr('clip-path', 'url(#theClipPath)')
 		.call(drag)
-	
+
 	constrainTheCutAndUpdateSVGpathTranslation()
 //	console.log(theCutRel)
 	clearCanvas()
-	currentTiling.draw()
-	
+	drawCurrent()
+
 	d3.select("#startupHelp").attr("style", "opacity: 1;")
-	
+
 	if (false) {
 		var slider2 = d3.slider()
 			.min(0.1)
@@ -642,7 +651,25 @@ function runAfterImageFinishedLoading() {
 	
 }
 
-
+function drawCurrent() {
+	try {
+		currentTiling.draw()
+	} catch(err) {
+		if (err.name === "NS_ERROR_NOT_AVAILABLE") {
+			console.log(err)
+			// I suspect that the svg has to be loaded beforehand. strange.
+			// retry after some time
+			window.setTimeout(function () {
+				console.log("redrawing ...")
+				updateCanvasAndSVGsize()
+				setCutRelWandH()
+				updateOnResizeOrImageSwitch()
+			}, 300)
+		} else {
+			throw err
+		}
+	}
+}
 
 
 
