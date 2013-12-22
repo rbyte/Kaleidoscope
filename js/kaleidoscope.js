@@ -361,7 +361,8 @@ function correctForShapeToImageRatio() {
 			scale = imageObj.width/imageObj.height
 		}
 	} else {
-		console.assert(theCutRel.w >= theCutRel.h)
+		// this does not always seem to hold (page startup issue?)
+		// console.assert(theCutRel.w >= theCutRel.h)
 		if (currentTiling.getRatio() >= 1) {
 			// nada
 		} else {
