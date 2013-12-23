@@ -8,6 +8,10 @@ body {
 	font-family: MySymbols; /* http://www.freefontconverter.com/ */
 	src: url("../vector/mySymbols3.ttf") format('truetype');
 }
+@font-face {
+	font-family: "Open Sans";
+	src: local ("Open Sans"), url("../vector/OpenSans-Light.ttf") format('truetype');
+}
 a {
 	outline : none;
 	text-decoration: none;
@@ -21,7 +25,7 @@ a {
 .symbol {
 	text-shadow: 0px 1px 0 rgba(0, 0, 0, 0.25); /* horizontal, vertical, blur, color */
     color: #ccc;
-	transition: all 300ms ease-in-out;
+	transition: color 300ms ease-in-out;
 }
 .fakeContent {
     color: transparent;
@@ -30,9 +34,11 @@ a {
 }
 #title {
 	position: absolute;
-	font-family: sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-size: 400%;
-	font-weight: 100;
+	font-weight: 100; /* lighter */
+	letter-spacing: 0.05em;
+	text-shadow: 0px 1px 0 rgba(0, 0, 0, 0.25);
 	top: 0;
 	left: 0;
 	padding: 2% 2% 3% 4%;
@@ -42,6 +48,9 @@ a {
 	/*width: 100%;*/
 	/*text-align: center;*/
 	color: #bbb;
+}
+.K-Up {
+	font-size: 115%;
 }
 #canvasFrame {
 	position: fixed;
@@ -71,7 +80,7 @@ a {
 
 #menu {
 	position: absolute;
-	top: 15%;
+	top: 19%;
 	left: 0;
 	margin: 0;
 	padding: 0;
@@ -85,7 +94,7 @@ a {
     white-space: nowrap;
 	cursor: pointer;
 	-moz-user-select: none;
-	transition: all 300ms ease-in-out;
+	transition: background 300ms ease-in-out, box-shadow 300ms ease-in-out;
 }
 #menu li:hover {
 	background: rgba(210, 210, 210, 0.8);
@@ -118,7 +127,6 @@ a {
 	margin: 0;
 	/*height: 25%;*/
 	background: rgba(230, 230, 230, 0.8);
-	transition: all 300ms ease-in-out;
 }
 #menu ul li:hover {
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1) inset;
@@ -149,12 +157,14 @@ a {
 	bottom: 3%;
 	width: 100%;
 	text-align: center;
+	cursor: default;
 	font-size: 150%;
 	font-weight: 100;
+	font-family: "Open Sans", sans-serif;
 	z-index: -1;
 	color: #999;
 	opacity: 0;
-	transition: all 800ms ease-in-out;
+	transition: opacity 800ms ease-in-out;
 }
 #startupHelp:before {
 	position: absolute;
@@ -162,7 +172,7 @@ a {
 	width: 0;
 	height: 0;
 	/*right: 40px;*/
-	top: -250%;
+	top: -150%;
 	left: 49%;
 	border-width: 20px 20px;
 	border-style: solid;

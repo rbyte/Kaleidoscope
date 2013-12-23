@@ -501,6 +501,10 @@ function updateCanvasAndSVGsize() {
 	var maxR = 0.5
 	var s = 0.8
 	
+	d3.select("#title").attr("style", "font-size: "+canvasSize*0.6+"% !important;")
+	d3.selectAll(".symbol").style({"font-size": canvasSize*0.9+"%"})
+	d3.selectAll(".fakeContent").style({"font-size": canvasSize*0.9+"%"})
+	
 	if (winW < winH) {
 		imgInSvgHeight = Math.round((winH - canvasSize)/2 * s)
 		imgInSvgWidth = Math.round(imgInSvgHeight * imageRatio)
@@ -602,6 +606,8 @@ function runAfterImageFinishedLoading() {
 			dragMove(d3.event.dx, d3.event.dy)
 		})
 
+	var elementsToHideCursorOnDuringDrag = "#kaleidoCanvas, #canvasFrame, #startupHelp, #svgdiv, #title"
+	
 	var dragForCanvas = d3.behavior.drag()
 		.on("drag", function (d) {
 			var canvasToImageScaleFactor = canvas.width/Math.max(imgInSvgWidth, imgInSvgHeight)
@@ -611,12 +617,10 @@ function runAfterImageFinishedLoading() {
 			)
 		})
 		.on("dragstart", function() {
-			d3.select('#kaleidoCanvas').attr("class", "hideCursor")
-			d3.select('#canvasFrame').attr("class", "hideCursor")
+			d3.selectAll(elementsToHideCursorOnDuringDrag).attr("class", "hideCursor")
 		})
 		.on("dragend", function() {
-			d3.select('#kaleidoCanvas').attr("class", "")
-			d3.select('#canvasFrame').attr("class", "")
+			d3.selectAll(elementsToHideCursorOnDuringDrag).attr("class", "") // remove
 		})
 
 	d3.select('#kaleidoCanvas').call(dragForCanvas)
