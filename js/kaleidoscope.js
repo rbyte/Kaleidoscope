@@ -24,7 +24,7 @@ var self = this
 self.thumbnailClick = function (newImgPath) {
 	d3.select('#theImage').attr('xlink:href', newImgPath)
 	loadCanvasImage(newImgPath, function() {
-		updateCanvasAndSVGsize()
+		updateScreenElemsSize()
 		setCutRelWandH()
 		updateOnResizeOrImageSwitch()
 	})
@@ -483,50 +483,53 @@ function setCutRelWandH() {
 	}
 }
 
-function updateCanvasAndSVGsize() {
+function updateScreenElemsSize(notSVG) {
 	var winW = document.body.clientWidth
 	var winH = window.innerHeight
 	
 	console.assert(winW > 0 && winH > 0)
 	var canvasSize = Math.round((winW < winH ? winW : winH) * 0.85)
+	
 	canvas.setAttribute("height", canvasSize+"px")
 	canvas.setAttribute("width", canvasSize+"px")
 	console.assert(canvasSize === canvas.width && canvasSize === canvas.height)
 	// center (0,0) in canvas !
 	context.translate(canvasSize/2, canvasSize/2)
 	
-	var svgdiv = document.getElementById('svgdiv')
-	console.assert(imageObj.width > 0 && imageObj.height > 0)
-	var imageRatio = imageObj.width/imageObj.height
-	var maxR = 0.5
-	var s = 0.8
-	
 	d3.select("#title").attr("style", "font-size: "+canvasSize*0.6+"% !important;")
 	d3.selectAll(".symbol").style({"font-size": canvasSize*0.9+"%"})
 	d3.selectAll(".fakeContent").style({"font-size": canvasSize*0.9+"%"})
 	
-	if (winW < winH) {
-		imgInSvgHeight = Math.round((winH - canvasSize)/2 * s)
-		imgInSvgWidth = Math.round(imgInSvgHeight * imageRatio)
-		
-		if (imgInSvgWidth > winW * maxR) {
-			imgInSvgWidth = Math.min(Math.round(winW * maxR), imgInSvgWidth)
-			imgInSvgHeight = Math.round(imgInSvgWidth / imageRatio)
-		}
-	} else {
-		imgInSvgWidth = Math.round((winW - canvasSize)/2 * s)
-		imgInSvgHeight = Math.round(imgInSvgWidth / imageRatio)
-		
-		if (imgInSvgHeight > winH * maxR) {
-			imgInSvgHeight = Math.min(Math.round(winH * maxR), imgInSvgHeight)
+	if (notSVG === undefined) {
+		// assert image has finished loaded
+		console.assert(imageObj.width > 0 && imageObj.height > 0)
+		var imageRatio = imageObj.width/imageObj.height
+		var maxR = 0.5
+		var s = 0.8
+
+		if (winW < winH) {
+			imgInSvgHeight = Math.round((winH - canvasSize)/2 * s)
 			imgInSvgWidth = Math.round(imgInSvgHeight * imageRatio)
+
+			if (imgInSvgWidth > winW * maxR) {
+				imgInSvgWidth = Math.min(Math.round(winW * maxR), imgInSvgWidth)
+				imgInSvgHeight = Math.round(imgInSvgWidth / imageRatio)
+			}
+		} else {
+			imgInSvgWidth = Math.round((winW - canvasSize)/2 * s)
+			imgInSvgHeight = Math.round(imgInSvgWidth / imageRatio)
+
+			if (imgInSvgHeight > winH * maxR) {
+				imgInSvgHeight = Math.min(Math.round(winH * maxR), imgInSvgHeight)
+				imgInSvgWidth = Math.round(imgInSvgHeight * imageRatio)
+			}
 		}
+
+		document.getElementById('svgdiv').setAttribute("style", "width: "+imgInSvgWidth+"px; height: "+imgInSvgHeight+"px;")
+		document.getElementById("slider1").setAttribute("style", "width: "+(imgInSvgWidth-2)+"px")
+		// shape slider internal one
+		shapeScaleSlider.setWidth(imgInSvgWidth)
 	}
-	
-	svgdiv.setAttribute("style", "width: "+imgInSvgWidth+"px; height: "+imgInSvgHeight+"px;")
-	document.getElementById("slider1").setAttribute("style", "width: "+(imgInSvgWidth-2)+"px")
-	// shape slider internal one
-	shapeScaleSlider.setWidth(imgInSvgWidth)
 }
 
 function dragMove(dx, dy) {
@@ -576,7 +579,7 @@ function runAfterImageFinishedLoading() {
 	d3.select('#slider1').call(shapeScaleSlider)
 
 	writeImagesToHTML()
-	updateCanvasAndSVGsize()
+	updateScreenElemsSize()
 	setCutRelWandH()
 	theCutRel.x = (1-theCutRel.w)/2
 	theCutRel.y = (1-theCutRel.h)/2
@@ -665,7 +668,7 @@ function drawCurrent() {
 			// retry after some time
 			window.setTimeout(function () {
 				console.log("redrawing ...")
-				updateCanvasAndSVGsize()
+				updateScreenElemsSize()
 				setCutRelWandH()
 				updateOnResizeOrImageSwitch()
 			}, 300)
@@ -732,9 +735,13 @@ var tilings = [
 var currentTiling = tilings[3]
 
 window.onresize = function(event) {
-	updateCanvasAndSVGsize()
+	updateScreenElemsSize()
 	updateOnResizeOrImageSwitch()
 }
+
+// will do this again after the image loaded, but I dont we the resize to be
+// visible (SVG cannot be resized jet because image size is still unknown)
+updateScreenElemsSize("but not the SVG!")
 
 loadCanvasImage(imgDir+"/"+images[defaultImage], runAfterImageFinishedLoading)
 
