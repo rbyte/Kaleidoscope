@@ -2,4 +2,4 @@ Kaleidoscope
 ============
 
 Demo:
-http://www.mgrf.de/kaleidoscope/
+http://mgrf.de/kaleidoscope/
