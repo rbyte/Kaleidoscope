@@ -1,5 +1,4 @@
 Kaleidoscope
 ============
 
-Demo:
-http://mgrf.de/kaleidoscope/
+http://rbyte.github.io/Kaleidoscope/
